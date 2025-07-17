@@ -1,0 +1,9 @@
+world: world
+a: 0,60,0
+b: 10,70,10
+cooldown: 10 # 单位秒，奖励间隔
+commands:
+  - cmd: 'say {player} 获得奖励!'
+    chance: 1.0
+subtitle: '&e挂机池奖励倒计时: &a{time}s' # 可自定义，{time}为倒计时占位符
+title: '&a挂机池' # 主标题
