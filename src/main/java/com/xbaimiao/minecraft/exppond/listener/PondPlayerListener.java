@@ -61,20 +61,47 @@ public class PondPlayerListener implements Listener {
     }
 
     private void triggerCommands(Player player, PondManager.Pond pond) {
-        if (pond.commands == null) return;
+        if (pond.commands == null || pond.commands.isEmpty()) return;
+        
+        // 创建一个权重列表，用于随机选择命令
+        java.util.List<Map<String, Object>> weightedCommands = new java.util.ArrayList<>();
+        java.util.List<Double> weights = new java.util.ArrayList<>();
+        double totalWeight = 0.0;
+        
+        // 计算每个命令的权重
         for (Map<String, Object> cmd : pond.commands) {
-            String command = (String) cmd.getOrDefault("cmd", "");
             double chance = 1.0;
             try {
                 chance = Double.parseDouble(cmd.getOrDefault("chance", 1.0).toString());
             } catch (Exception ignored) {}
-            if (Math.random() <= chance) {
+            
+            if (chance > 0) {
+                weightedCommands.add(cmd);
+                weights.add(chance);
+                totalWeight += chance;
+            }
+        }
+        
+        // 如果没有有效命令，直接返回
+        if (weightedCommands.isEmpty()) return;
+        
+        // 随机选择一个命令执行
+        double random = Math.random() * totalWeight;
+        double cumulativeWeight = 0.0;
+        
+        for (int i = 0; i < weightedCommands.size(); i++) {
+            cumulativeWeight += weights.get(i);
+            if (random <= cumulativeWeight) {
+                Map<String, Object> selectedCmd = weightedCommands.get(i);
+                String command = (String) selectedCmd.getOrDefault("cmd", "");
+                
                 // 只对池内玩家有效
                 if (PondManager.getPondByPlayer(player) == pond) {
                     Bukkit.getScheduler().runTask(com.xbaimiao.minecraft.exppond.Main.getInstance(),
                         () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()))
                     );
                 }
+                break; // 只执行一个命令后退出
             }
         }
     }

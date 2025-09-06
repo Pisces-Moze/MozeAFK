@@ -33,14 +33,34 @@ public class SelectionManager {
         File dir = new File(JavaPlugin.getProvidingPlugin(SelectionManager.class).getDataFolder(), "ponds");
         if (!dir.exists()) dir.mkdirs();
         File file = new File(dir, name + ".yml");
-        try (FileWriter writer = new FileWriter(file)) {
+        
+        // 读取模板文件
+        java.io.InputStream templateStream = JavaPlugin.getProvidingPlugin(SelectionManager.class).getResource("ponds/example.yml");
+        if (templateStream == null) {
+            System.err.println("无法找到模板文件 ponds/example.yml");
+            return false;
+        }
+        
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(templateStream));
+             FileWriter writer = new FileWriter(file)) {
+            
             String worldName = (sel.a != null && sel.a.getWorld() != null) ? sel.a.getWorld().getName() : (sel.b != null && sel.b.getWorld() != null ? sel.b.getWorld().getName() : "world");
-            writer.write("world: " + worldName + "\n");
-            writer.write("a: " + sel.a.getBlockX() + "," + sel.a.getBlockY() + "," + sel.a.getBlockZ() + "\n");
-            writer.write("b: " + sel.b.getBlockX() + "," + sel.b.getBlockY() + "," + sel.b.getBlockZ() + "\n");
-            // 预留命令、冷却等配置
-            writer.write("commands:\n  - cmd: 'say 玩家获得奖励'\n    chance: 1.0\n    cooldown: 10\n");
-            writer.write("title: '&a挂机池'\n");
+            String aCoords = sel.a.getBlockX() + "," + sel.a.getBlockY() + "," + sel.a.getBlockZ();
+            String bCoords = sel.b.getBlockX() + "," + sel.b.getBlockY() + "," + sel.b.getBlockZ();
+            
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // 替换坐标和世界名
+                if (line.startsWith("world:")) {
+                    line = "world: " + worldName;
+                } else if (line.startsWith("a:")) {
+                    line = "a: " + aCoords;
+                } else if (line.startsWith("b:")) {
+                    line = "b: " + bCoords;
+                }
+                writer.write(line + "\n");
+            }
+            
             return true;
         } catch (IOException e) {
             System.err.println("保存挂机池选区失败: " + e.getMessage());

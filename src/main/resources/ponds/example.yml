@@ -1,6 +1,6 @@
-world: world
-a: 0,60,0
-b: 10,70,10
+world: 
+a: 
+b: 
 cooldown: 10 # 单位秒，奖励间隔
 commands:
   - cmd: 'say {player} 获得奖励!'
