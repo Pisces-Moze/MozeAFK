@@ -9,7 +9,6 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        // 彩蛋LOGO和作者信息
         getLogger().info(" _____ ______       ________      ________      _______      ");
         getLogger().info("|\\   _ \\  _   \\    |\\   __  \\    |\\_____  \\    |\\  ___ \\     ");
         getLogger().info("\\ \\  \\\\__\\ \\  \\   \\ \\  \\|\\  \\    \\|___/  /|   \\ \\   __/|    ");

@@ -27,7 +27,13 @@ public class PondPlayerListener implements Listener {
                     PondManager.Pond pond = PondManager.getPondByPlayer(player);
                     if (pond != null) {
                         long now = System.currentTimeMillis();
-                        long next = playerNextTrigger.getOrDefault(player.getUniqueId(), 0L);
+                        // 检查玩家是否是第一次进入挂机池
+                        if (!playerPond.containsKey(player.getUniqueId())) {
+                            // 玩家首次进入挂机池，设置初始冷却时间
+                            long minCooldown = getMinCooldown(pond);
+                            playerNextTrigger.put(player.getUniqueId(), now + minCooldown * 1000);
+                        }
+                        long next = playerNextTrigger.getOrDefault(player.getUniqueId(), now + getMinCooldown(pond) * 1000);
                         if (now >= next) {
                             triggerCommands(player, pond);
                             long minCooldown = getMinCooldown(pond);
